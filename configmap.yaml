@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: fgc
+data:
+  # Datasources do Grafana
+  prometheus-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+
+  jaeger-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Jaeger
+        type: jaeger
+        access: proxy
+        url: http://jaeger:16686
+        isDefault: false
+
+  # Dashboard básico Kubernetes / Pods
+  kubernetes-dashboard.json: |
+    {
+      "id": null,
+      "title": "Kubernetes Pods Overview",
+      "tags": ["k8s", "pods"],
+      "timezone": "browser",
+      "panels": [
+        {
+          "type": "graph",
+          "title": "CPU Usage per Pod",
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"fgc\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ],
+          "datasource": "Prometheus"
+        },
+        {
+          "type": "graph",
+          "title": "Memory Usage per Pod",
+          "targets": [
+            {
+              "expr": "sum(container_memory_usage_bytes{namespace=\"fgc\"}) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ],
+          "datasource": "Prometheus"
+        }
+      ]
+    }

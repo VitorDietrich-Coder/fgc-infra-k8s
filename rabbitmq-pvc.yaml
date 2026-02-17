@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp2   # ou gp3, depende do seu cluster
+  hostPath:
+    path: /mnt/data/rabbitmq   # apenas para testes locais no nó; para produção use EBS

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: fgc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          # Tag ajustada para uma estável
+          image: grafana/grafana:9.5.6
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+            - name: GF_PATHS_PROVISIONING
+              value: /etc/grafana/provisioning
+          volumeMounts:
+            - name: grafana-provisioning
+              mountPath: /etc/grafana/provisioning
+      volumes:
+        - name: grafana-provisioning
+          configMap:
+            name: grafana-config
+            items:
+              - key: prometheus-datasource.yaml
+                path: datasources/prometheus.yaml
+              - key: jaeger-datasource.yaml
+                path: datasources/jaeger.yaml
+              - key: kubernetes-dashboard.json
+                path: dashboards/kubernetes-dashboard.json
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: fgc
+spec:
+  type: LoadBalancer
+  selector:
+    app: grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000

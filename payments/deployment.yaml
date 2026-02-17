@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: fgc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      containers:
+        - name: payments-api
+          image: 626547610206.dkr.ecr.us-east-1.amazonaws.com/payments-microservice:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: fgc-config
+            - secretRef:
+                name: fgc-secrets

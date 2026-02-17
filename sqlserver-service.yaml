@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqlserver
+  namespace: fgc
+spec:
+  ports:
+    - port: 1433
+  selector:
+    app: sqlserver
+  type: ClusterIP

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api
+  namespace: fgc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-api
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+        - name: users-api
+          image: 626547610206.dkr.ecr.us-east-1.amazonaws.com/user-microservice:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: fgc-config
+            - secretRef:
+                name: fgc-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
